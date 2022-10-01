@@ -1,7 +1,7 @@
 import React from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
 import { styles } from "./styles";
-import { Button } from "../../components";
+import { CustomButton, CustomTextInput } from "../../components";
 
 function SignIn() {
   const onPress = () => {
@@ -10,34 +10,26 @@ function SignIn() {
   return (
     <View style={styles.container}>
       <View>
-        <Text>{"Olá! Seja bem vindo(a)!"}</Text>
+        <Text style={{ color: "#00A861", fontWeight: "700", fontSize: 28 }}>{"Olá! Seja bem vindo(a)!"}</Text>
+        <Text style={{ fontSize: 16, color: "#4D4D4D" }}>
+          {"Acesse ou crie uma conta para ajudar pessoas"}
+        </Text>
       </View>
       <View>
         <View>
-          <Text>Email</Text>
-          <TextInput
-            style={{
-              height: 40,
-              borderColor: "gray",
-              borderWidth: 1,
-            }}
-          />
+          <Text style={{ fontSize: 16, fontWeight: "700", marginBottom: 8 }}>E-mail</Text>
+          <CustomTextInput placeholder="seu_email@email.com" />
         </View>
+        <View style={{ height: 32 }} />
         <View>
-          <Text>Senha</Text>
-          <TextInput
-            style={{
-              height: 40,
-              borderColor: "gray",
-              borderWidth: 1,
-            }}
-          />
+          <Text style={{ fontSize: 16, fontWeight: "700", marginBottom: 8 }}>Senha</Text>
+          <CustomTextInput placeholder="************" />
         </View>
-        <View>
-          <Text>Esqueci minha senha</Text>
-        </View>
-        <Button onPress={onPress} title={"Entrar"} />
-        <Button onPress={onPress} title={"Criar uma conta"} />
+      </View>
+      <View>
+        <CustomButton onPress={onPress} title={"Entrar"} />
+        <View style={{ height: 16 }} />
+        <CustomButton onPress={onPress} variant={"outline"} title={"Criar uma conta"} />
       </View>
     </View>
   );

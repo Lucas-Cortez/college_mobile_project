@@ -1,12 +1,13 @@
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, View } from "react-native";
 import { SignIn } from "./src/screens/SignIn";
+import { SignUp } from "./src/screens/SignUp";
 
 export default function App() {
   return (
     <>
-      <StatusBar />
-      <SignIn />
+      {/* <StatusBar /> */}
+      {/* <SignIn /> */}
+      <SignUp />
     </>
   );
 }
