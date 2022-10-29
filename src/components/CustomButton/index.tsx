@@ -1,5 +1,5 @@
-import { Text, TouchableOpacity } from "react-native";
-import { styles } from "./styles";
+import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import styled, { css } from "styled-components/native";
 
 interface CustomButtonProps {
   variant?: "solid" | "outline";
@@ -7,16 +7,41 @@ interface CustomButtonProps {
   onPress(): void;
 }
 
-function CustomButton({ title, onPress, variant = "solid" }: CustomButtonProps) {
-  return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={onPress}
-      style={variant === "solid" ? styles.button : styles.button_outline}
-    >
-      <Text style={variant === "solid" ? styles.text : styles.text_outline}>{title}</Text>
-    </TouchableOpacity>
-  );
-}
+type VariantsProps = {
+  variant: "solid" | "outline";
+};
 
-export { CustomButton };
+export const CustomButton: React.FC<CustomButtonProps> = ({ title, variant = "solid", onPress }) => {
+  return (
+    <ButtonContainer onPress={onPress} variant={variant}>
+      <StyledText variant={variant}>{title}</StyledText>
+    </ButtonContainer>
+  );
+};
+
+const ButtonContainer = styled.TouchableOpacity.attrs({ activeOpacity: 0.7 })<VariantsProps>`
+  width: 100%;
+  padding: 10px 12px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  ${({ variant }) =>
+    variant === "outline" &&
+    css`
+      border-color: #00a861;
+      border-width: 1px;
+    `}
+  ${({ variant }) =>
+    variant === "solid" &&
+    css`
+      background-color: #00a861;
+    `}
+`;
+
+const StyledText = styled.Text<VariantsProps>`
+  font-size: 24px;
+  color: #00a861;
+  font-weight: 700;
+  color: ${({ variant }) => (variant === "outline" ? "#00A861" : "#ffffff")};
+`;

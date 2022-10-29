@@ -1,7 +1,7 @@
 import React from "react";
-import { Text, View } from "react-native";
-import { styles } from "./styles";
-import { CustomButton, CustomTextInput } from "../../components";
+import { StatusBar, Text, View, StyleSheet } from "react-native";
+import { BackButton, CustomButton, CustomTextInput } from "../../components";
+import Feather from "@expo/vector-icons/Feather";
 
 function SignUp() {
   const onPress = () => {
@@ -11,7 +11,13 @@ function SignUp() {
   return (
     <View style={styles.container}>
       <View>
-        <Text style={{ color: "#00A861", fontWeight: "700", fontSize: 28 }}>{"Criar uma conta"}</Text>
+        {/* <Feather name={"arrow-right"} size={25} style={styles.icon} /> */}
+        <BackButton />
+        <Text
+          style={{ color: "#00A861", fontWeight: "700", fontSize: 28, marginTop: StatusBar.currentHeight }}
+        >
+          {"Criar uma conta"}
+        </Text>
       </View>
       <View>
         <View>
@@ -42,5 +48,21 @@ function SignUp() {
     </View>
   );
 }
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "space-around",
+    paddingHorizontal: 16,
+  },
+  icon: {
+    color: "#fff",
+    width: 25,
+    height: 25,
+    // backgroundColor: "red",
+    marginLeft: 50,
+  },
+});
 
 export { SignUp };

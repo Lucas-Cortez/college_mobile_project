@@ -1,13 +1,10 @@
-import { StatusBar } from "expo-status-bar";
-import { SignIn } from "./src/screens/SignIn";
-import { SignUp } from "./src/screens/SignUp";
+import { NavigationContainer } from "@react-navigation/native";
+import { StackNavigation } from "./src/routes/Stack.routes";
 
 export default function App() {
   return (
-    <>
-      {/* <StatusBar /> */}
-      {/* <SignIn /> */}
-      <SignUp />
-    </>
+    <NavigationContainer>
+      <StackNavigation />
+    </NavigationContainer>
   );
 }
