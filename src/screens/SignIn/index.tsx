@@ -9,12 +9,13 @@ export const SignIn = () => {
   const navigation = useNavigation();
 
   const onPress = () => {
-    navigation.navigate("Dashboard");
+    navigation.navigate("main");
+    // popIn();
   };
 
   const makeAccountPage = () => {
     // navigation.navigate("SignUp");
-    navigation.navigate("SignUp");
+    navigation.navigate("signup");
   };
 
   return (
@@ -36,7 +37,7 @@ export const SignIn = () => {
           <View style={{ height: 32 }} />
           <View>
             <Text style={{ fontSize: 16, fontWeight: "700", marginBottom: 8 }}>Senha</Text>
-            <CustomTextInput placeholder="************" />
+            <CustomTextInput secureTextEntry placeholder="************" />
           </View>
         </View>
         <View>

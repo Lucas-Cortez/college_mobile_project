@@ -1,11 +1,21 @@
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacityProps } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import styled from "styled-components/native";
 
-export const BackButton: React.FC = () => {
+export const BackButton: React.FC<TouchableOpacityProps> = (props) => {
   return (
-    <TouchableOpacity>
-      <Feather name={"arrow-left"} size={25} />
-    </TouchableOpacity>
+    <StyledBackButton {...props}>
+      <Feather name={"arrow-left"} size={22} />
+    </StyledBackButton>
   );
 };
+
+const StyledBackButton = styled.TouchableOpacity`
+  height: 32px;
+  width: 32px;
+  background-color: #e2e2e2;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+`;
