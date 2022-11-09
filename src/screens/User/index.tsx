@@ -1,8 +1,17 @@
 import React from "react";
-import { StatusBar, Text, View } from "react-native";
+import { StatusBar, Text, TouchableOpacity, View, Dimensions } from "react-native";
 import { Layout } from "../../components";
+import { Feather } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 export const User: React.FC = () => {
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+
+  const bottom = insets.bottom;
+  const screen = Dimensions.get("screen");
+
   return (
     <Layout>
       <View
@@ -43,8 +52,29 @@ export const User: React.FC = () => {
             paddingRight: 16,
           }}
         >
-          <Text style={{ fontSize: 16, opacity: 0.7 }}>bigdanielbigbutt@gmail.com</Text>
-          <Text style={{ fontSize: 16, opacity: 0.7 }}>bigdanielburro123</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Feather name={"mail"} size={14} />
+            <Text style={{ fontSize: 16, opacity: 0.7, marginLeft: 9 }}>bigdanielbigbutt@gmail.com</Text>
+          </View>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={{
+              width: "100%",
+              backgroundColor: "#E45757",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 8,
+              paddingVertical: 10,
+              paddingHorizontal: 12,
+              marginTop: screen.height - bottom - 320,
+            }}
+            onPress={() => {
+              navigation.navigate("signin");
+            }}
+          >
+            <Text style={{ fontWeight: "700", fontSize: 24, color: "#fff" }}>Sair</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Layout>

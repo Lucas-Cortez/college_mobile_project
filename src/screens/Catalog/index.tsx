@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import { Layout } from "../../components";
 import { Feather } from "@expo/vector-icons";
-import Carousel, { TCarouselProps } from "react-native-reanimated-carousel";
 
 export const Catalog: React.FC = () => {
   return (
@@ -65,13 +64,6 @@ const HeaderComponent = () => {
           Agricultores
         </Text>
 
-        {/* <Carousel
-          style={{ width: "100%" }}
-          data={[1, 2, 3, 4]}
-          loop={false}
-          renderItem={CarouselItem}
-          width={185}
-        /> */}
         <FlatList
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
