@@ -1,25 +1,31 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export class Service<T> {
+type Id = {
+  id: string;
+};
+export class Service<T extends Id> {
   private serviceTable: string;
 
   constructor(serviceTable: string) {
-    this.serviceTable = `@storage_Key/${serviceTable}`;
+    this.serviceTable = `@college_mobile_project/${serviceTable}`;
   }
 
-  async getAll(): Promise<T[]> {
+  async findAll(): Promise<T[]> {
     const data = await AsyncStorage.getItem(this.serviceTable);
     return !!data ? JSON.parse(data) : [];
   }
 
-  async setItem(obj: T) {
-    const previousData = await this.getAll();
+  async findByid(id: string): Promise<T | null> {
+    const previousData = await this.findAll();
+    if (!previousData) return null;
+    const data = previousData.find((el: T) => el.id === id);
+    return data || null;
+  }
+
+  async create(obj: T) {
+    const previousData = await this.findAll();
     const data = previousData ? previousData : [];
     await AsyncStorage.setItem(this.serviceTable, JSON.stringify([...data, obj]));
     return obj;
-  }
-
-  async remove(): Promise<void> {
-    await AsyncStorage.removeItem(this.serviceTable);
   }
 }

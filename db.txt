@@ -1,0 +1,30 @@
+criar usuario
+autenticar usuario
+pegar agricultores
+pegar alimentos dos agricultores
+criar comprar realizada no usuário
+
+
+Usuario:
+id
+nome
+email
+senha
+compras
+    quantidade itens
+    data
+    valor
+
+---------------------------------------------
+
+Agricultor:
+nome
+apelido
+cidade
+estado
+produtos
+    nome
+    kgPorcao
+    valor
+
+
