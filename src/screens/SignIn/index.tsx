@@ -1,16 +1,31 @@
 import React from "react";
-import { SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, StatusBar, Text, View } from "react-native";
 import { CustomButton, CustomTextInput, Layout } from "../../components";
 import styled from "styled-components/native";
-import { StatusBar } from "expo-status-bar";
+// import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
+import { Service } from "../../services";
+import Toast from "react-native-toast-message";
+
+type User = {
+  id: number;
+  name: string;
+};
 
 export const SignIn = () => {
   const navigation = useNavigation();
+  const userService = new Service<User>("user");
 
-  const onPress = () => {
-    navigation.navigate("main");
-    // popIn();
+  const onPress = async () => {
+    // navigation.navigate("main");
+    // await userService.setItem({ id: 1, name: "bigDaniel" });
+    // const opa = await userService.getAll();
+    // await userService.remove();
+    // console.log(opa);
+    Toast.show({
+      type: "success",
+      text1: "testando",
+    });
   };
 
   const makeAccountPage = () => {
