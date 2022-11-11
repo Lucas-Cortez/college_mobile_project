@@ -9,7 +9,7 @@ import { useUserContext } from "../../contexts/userContext";
 export const User: React.FC = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const { setUser } = useUserContext();
+  const { setUser, user } = useUserContext();
 
   const bottom = insets.bottom;
   const screen = Dimensions.get("screen");
@@ -49,7 +49,7 @@ export const User: React.FC = () => {
             }}
           />
           <Text style={{ fontSize: 24, fontWeight: "700", color: "#000000CC", marginLeft: 16 }}>
-            Big Daniel
+            {user?.name}
           </Text>
         </View>
 
@@ -61,7 +61,7 @@ export const User: React.FC = () => {
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Feather name={"mail"} size={14} />
-            <Text style={{ fontSize: 16, opacity: 0.7, marginLeft: 9 }}>bigdanielbigbutt@gmail.com</Text>
+            <Text style={{ fontSize: 16, opacity: 0.7, marginLeft: 9 }}>{user?.email}</Text>
           </View>
 
           <TouchableOpacity
