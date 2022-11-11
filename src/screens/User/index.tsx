@@ -4,13 +4,20 @@ import { Layout } from "../../components";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import { useUserContext } from "../../contexts/userContext";
 
 export const User: React.FC = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { setUser } = useUserContext();
 
   const bottom = insets.bottom;
   const screen = Dimensions.get("screen");
+
+  const handleGetOut = () => {
+    setUser(null);
+    navigation.navigate("signin");
+  };
 
   return (
     <Layout>
@@ -69,9 +76,7 @@ export const User: React.FC = () => {
               paddingHorizontal: 12,
               marginTop: screen.height - bottom - 320,
             }}
-            onPress={() => {
-              navigation.navigate("signin");
-            }}
+            onPress={handleGetOut}
           >
             <Text style={{ fontWeight: "700", fontSize: 24, color: "#fff" }}>Sair</Text>
           </TouchableOpacity>
