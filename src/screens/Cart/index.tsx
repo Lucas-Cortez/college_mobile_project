@@ -2,9 +2,27 @@ import React from "react";
 import { StatusBar, Text, TouchableOpacity, View, Dimensions, Image, ScrollView } from "react-native";
 import { CustomButton, Layout } from "../../components";
 import { Feather } from "@expo/vector-icons";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { CartProduct, useCartContext } from "../../contexts/cartContext";
+import Toast from "react-native-toast-message";
+import { useNavigation } from "@react-navigation/native";
+
+const formatToMoney = (value: number) => `R$ ${value.toFixed(2).toString().replace(".", ",")}`;
 
 export const Cart: React.FC = () => {
+  const { total, cart, removeFromCart, increaseAmount, decreaseAmount, clearCart } = useCartContext();
+  const { navigate } = useNavigation();
+
+  const handleEndDonation = () => {
+    console.log(total);
+    if (total <= 5) {
+      return Toast.show({ type: "error", text1: "Seu carrinho está vazio" });
+    } else {
+      clearCart();
+      navigate("catalog");
+      return Toast.show({ type: "success", text1: "Obrigado pela sua doação!" });
+    }
+  };
+
   return (
     <Layout>
       <View
@@ -18,22 +36,17 @@ export const Cart: React.FC = () => {
           Meu carrinho
         </Text>
 
-        <ScrollView
-          //   style={{ marginBottom: 75 }}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-        >
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
+        <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
+          {cart.map((product) => (
+            <ItemCard
+              key={`${product._id}`}
+              product={product}
+              removeFromCart={removeFromCart}
+              increaseAmount={increaseAmount}
+              decreaseAmount={decreaseAmount}
+            />
+          ))}
+          <View style={{ height: 300 }} />
         </ScrollView>
       </View>
 
@@ -59,7 +72,7 @@ export const Cart: React.FC = () => {
             }}
           >
             <Text style={{ fontSize: 16, color: "#000000B2" }}>5 itens</Text>
-            <Text style={{ fontSize: 16, color: "#000000B2" }}>R$ 200,00</Text>
+            <Text style={{ fontSize: 16, color: "#000000B2" }}>{formatToMoney(total)}</Text>
           </View>
 
           <View
@@ -84,21 +97,23 @@ export const Cart: React.FC = () => {
           }}
         >
           <Text style={{ fontSize: 28, fontWeight: "700", color: "#000000B2" }}>Total</Text>
-          <Text style={{ fontSize: 28, fontWeight: "700", color: "#000000B2" }}>R$ 250,00</Text>
+          <Text style={{ fontSize: 28, fontWeight: "700", color: "#000000B2" }}>
+            {formatToMoney(total + 50)}
+          </Text>
         </View>
 
-        <CustomButton
-          title="Finalizar doação"
-          onPress={() => {
-            console.log("finalizou");
-          }}
-        />
+        <CustomButton title="Finalizar doação" onPress={() => handleEndDonation()} />
       </View>
     </Layout>
   );
 };
 
-const ItemCard: React.FC = () => {
+const ItemCard: React.FC<{
+  product: CartProduct;
+  removeFromCart(id: CartProduct["_id"]): void;
+  increaseAmount(id: CartProduct["_id"]): void;
+  decreaseAmount(id: CartProduct["_id"]): void;
+}> = ({ product, increaseAmount, decreaseAmount }) => {
   return (
     <View
       style={{
@@ -119,28 +134,67 @@ const ItemCard: React.FC = () => {
       <View style={{ marginLeft: 8, justifyContent: "space-between", flexDirection: "row" }}>
         <View style={{ justifyContent: "space-between" }}>
           <View>
-            <Text style={{ color: "#4D4D4D", fontSize: 16, fontWeight: "700" }}>Feijão - 2 KG</Text>
-            <Text style={{ fontSize: 12, color: "#00000080", fontWeight: "400" }}>Mineirinho agricultor</Text>
+            <Text
+              style={{ color: "#4D4D4D", fontSize: 16, fontWeight: "700" }}
+            >{`${product.name} - ${product.kgPortion} KG`}</Text>
+            <Text style={{ fontSize: 12, color: "#00000080", fontWeight: "400" }}>{product.nickname}</Text>
           </View>
 
-          <Text style={{ color: "#00A861", fontWeight: "700", fontSize: 16 }}>R$ 15,99</Text>
+          <Text style={{ color: "#00A861", fontWeight: "700", fontSize: 16 }}>
+            {`R$ ${product.value.toFixed(2).toString().replace(".", ",")}`}
+          </Text>
         </View>
       </View>
 
       <View style={{ flexDirection: "column-reverse", marginLeft: "auto" }}>
-        <TouchableOpacity
-          activeOpacity={0.75}
-          style={{
-            height: 32,
-            width: 40,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#00A861",
-            borderRadius: 4,
-          }}
-        >
-          <Feather name={"shopping-cart"} size={14} color={"white"} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row" }}>
+          <TouchableOpacity
+            onPress={() => {
+              decreaseAmount(product._id);
+            }}
+            activeOpacity={0.75}
+            style={{
+              height: 32,
+              width: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#00A861",
+              borderRadius: 4,
+            }}
+          >
+            <Feather name={"minus"} size={16} color={"white"} />
+          </TouchableOpacity>
+          <View
+            style={{
+              height: 32,
+              width: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 4,
+              borderColor: "#00000033",
+              borderWidth: 1,
+              marginHorizontal: 6,
+            }}
+          >
+            <Text>{product.quantity}</Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              increaseAmount(product._id);
+            }}
+            activeOpacity={0.75}
+            style={{
+              height: 32,
+              width: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#00A861",
+              borderRadius: 4,
+            }}
+          >
+            <Feather name={"plus"} size={16} color={"white"} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

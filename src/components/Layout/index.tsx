@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView } from "react-native";
+import { Keyboard, SafeAreaView, TouchableWithoutFeedback } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
 type LayoutProps = {
@@ -15,7 +15,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       }}
     >
       <StatusBar />
-      {children}
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <>{children}</>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };

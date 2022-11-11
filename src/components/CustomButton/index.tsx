@@ -1,7 +1,7 @@
-import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet, TouchableOpacityProps } from "react-native";
 import styled, { css } from "styled-components/native";
 
-interface CustomButtonProps {
+interface CustomButtonProps extends TouchableOpacityProps {
   variant?: "solid" | "outline";
   title: string;
   onPress(): void;
@@ -11,9 +11,9 @@ type VariantsProps = {
   variant: "solid" | "outline";
 };
 
-export const CustomButton: React.FC<CustomButtonProps> = ({ title, variant = "solid", onPress }) => {
+export const CustomButton: React.FC<CustomButtonProps> = ({ title, variant = "solid", onPress, ...rest }) => {
   return (
-    <ButtonContainer onPress={onPress} variant={variant}>
+    <ButtonContainer {...rest} onPress={onPress} variant={variant}>
       <StyledText variant={variant}>{title}</StyledText>
     </ButtonContainer>
   );

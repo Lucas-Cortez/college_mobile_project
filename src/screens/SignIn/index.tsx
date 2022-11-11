@@ -1,36 +1,50 @@
-import React from "react";
-import { SafeAreaView, StatusBar, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Text, View } from "react-native";
 import { CustomButton, CustomTextInput, Layout } from "../../components";
 import styled from "styled-components/native";
-// import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
-import { Service } from "../../services";
 import Toast from "react-native-toast-message";
-
-type User = {
-  id: string;
-  name: string;
-};
+import { useUserController } from "../../hooks/useUserController";
+import { useUserContext } from "../../contexts/userContext";
+// import { Service } from "../../services/Service";
+// import { User } from "../../@types/User";
 
 export const SignIn = () => {
-  const navigation = useNavigation();
-  const userService = new Service<User>("user");
+  const { navigate } = useNavigation();
+  const { authenticate } = useUserController();
+  const { setUser } = useUserContext();
 
-  const onPress = async () => {
-    navigation.navigate("main");
-    // await userService.setItem({ id: "1", name: "bigDaniel" });
-    // const opa = await userService.getAll();
-    // await userService.remove();
-    // console.log(opa);
-    // Toast.show({
-    //   type: "success",
-    //   text1: "testando",
-    // });
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const onPressEnter = async () => {
+    if (!email || !password) {
+      return Toast.show({
+        type: "error",
+        text1: "Campos incompletos",
+      });
+    }
+
+    try {
+      const user = await authenticate(email, password);
+      // console.log(user);
+      if (!user) {
+        throw new Error("Autenticação Falhou");
+      }
+      const { purchases, password: passw, ...rest } = user;
+      setUser({ ...rest });
+      navigate("main");
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: `${error}`,
+        text2: "Usuário ou senha incorretos",
+      });
+    }
   };
 
-  const makeAccountPage = () => {
-    // navigation.navigate("SignUp");
-    navigation.navigate("signup");
+  const onPressCreateAccount = () => {
+    navigate("signup");
   };
 
   return (
@@ -47,18 +61,18 @@ export const SignIn = () => {
         <View>
           <View>
             <Text style={{ fontSize: 16, fontWeight: "700", marginBottom: 8 }}>E-mail</Text>
-            <CustomTextInput placeholder="seu_email@email.com" />
+            <CustomTextInput onChangeText={(t) => setEmail(t)} placeholder="seu_email@email.com" />
           </View>
           <View style={{ height: 32 }} />
           <View>
             <Text style={{ fontSize: 16, fontWeight: "700", marginBottom: 8 }}>Senha</Text>
-            <CustomTextInput secureTextEntry placeholder="************" />
+            <CustomTextInput onChangeText={(t) => setPassword(t)} secureTextEntry placeholder="*********" />
           </View>
         </View>
         <View>
-          <CustomButton onPress={onPress} title={"Entrar"} />
+          <CustomButton onPress={onPressEnter} title={"Entrar"} />
           <View style={{ height: 16 }} />
-          <CustomButton onPress={makeAccountPage} variant={"outline"} title={"Criar uma conta"} />
+          <CustomButton onPress={onPressCreateAccount} variant={"outline"} title={"Criar uma conta"} />
         </View>
       </Container>
     </Layout>

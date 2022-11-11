@@ -18,6 +18,7 @@ compras
 ---------------------------------------------
 
 Agricultor:
+id
 nome
 apelido
 cidade
@@ -26,5 +27,9 @@ produtos
     nome
     kgPorcao
     valor
+
+
+
+
 
 

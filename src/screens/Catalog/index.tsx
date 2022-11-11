@@ -1,46 +1,83 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import {
   FlatList,
   Image,
   ImageBackground,
-  ScrollView,
+  ListRenderItem,
   StatusBar,
-  StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { Layout } from "../../components";
 import { Feather } from "@expo/vector-icons";
+import { IUserContext, useUserContext } from "../../contexts/userContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { useFarmerController } from "../../hooks/useFarmerController";
+import { Farmer, Product } from "../../@types/Farmer";
+import { useCartContext } from "../../contexts/cartContext";
 
 export const Catalog: React.FC = () => {
+  const { user } = useUserContext();
+  const { findAllFarmers } = useFarmerController();
+
+  const [farmers, setFarmers] = useState<Farmer[]>([]);
+  const [farmerId, setFarmerId] = useState<Farmer["_id"] | null>(null);
+
+  const products = farmerId ? farmers.find((farmer) => farmer._id === farmerId)?.products : [];
+
+  const onClickFarmer = async (id: Farmer["_id"]) => {
+    setFarmerId(id);
+  };
+
+  const getFarmers = async () => {
+    const data = await findAllFarmers();
+    setFarmers(!!data ? data : []);
+    if (data.length) {
+      setFarmerId(data[0]._id);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!farmers.length) getFarmers();
+    }, [])
+  );
+
   return (
     <Layout>
       <View
         style={{
-          // justifyContent: "center",
-          // alignItems: "center",
           marginTop: StatusBar.currentHeight,
           paddingLeft: 16,
           paddingRight: 16,
         }}
       >
         <FlatList
-          ListHeaderComponent={HeaderComponent}
+          ListHeaderComponent={() => (
+            <HeaderComponent onClickFarmer={onClickFarmer} farmers={farmers} user={user} />
+          )}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]}
-          renderItem={ItemCard}
-          keyExtractor={(item) => item.toString()}
+          data={!!products ? products : []}
+          renderItem={({ ...props }) => (
+            <ItemCard {...props} farmer={farmers.find((farmer) => farmer._id === farmerId)?.nickname || ""} />
+          )}
+          keyExtractor={(item) => item._id.toString()}
         />
       </View>
     </Layout>
   );
 };
 
-const HeaderComponent = () => {
+const HeaderComponent: React.FC<{
+  user: IUserContext["user"];
+  farmers: Farmer[];
+  onClickFarmer(id: Farmer["_id"]): Promise<void>;
+}> = ({ user, farmers, onClickFarmer }) => {
+  // console.log(farmers);
+
   return (
     <>
       <View style={{ flexDirection: "row", width: "100%", marginBottom: 24, marginTop: 32 }}>
@@ -54,7 +91,7 @@ const HeaderComponent = () => {
           }}
         />
         <View style={{ alignSelf: "center", marginLeft: 8 }}>
-          <Text style={{ fontSize: 16, color: "#000000CC" }}>Olá Big Daniel!</Text>
+          <Text style={{ fontSize: 16, color: "#000000CC" }}>Olá {user?.name}!</Text>
           <Text style={{ fontSize: 16, color: "#000000CC" }}>Vamos fazer uma boa ação hoje?</Text>
         </View>
       </View>
@@ -67,10 +104,10 @@ const HeaderComponent = () => {
         <FlatList
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          data={[1, 2, 3, 4, 5]}
-          renderItem={CarouselItem}
+          data={farmers}
+          renderItem={({ ...props }) => <CarouselItem {...props} onClickFarmer={onClickFarmer} />}
           horizontal={true}
-          keyExtractor={(item) => item.toString()}
+          keyExtractor={(item) => item._id.toString()}
           ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
         />
       </View>
@@ -82,7 +119,9 @@ const HeaderComponent = () => {
   );
 };
 
-const ItemCard: React.FC = () => {
+const ItemCard: React.FC<{ item: Product; farmer: string }> = ({ item, farmer }) => {
+  const { addCart } = useCartContext();
+
   return (
     <View
       style={{
@@ -103,16 +142,23 @@ const ItemCard: React.FC = () => {
       <View style={{ marginLeft: 8, justifyContent: "space-between", flexDirection: "row" }}>
         <View style={{ justifyContent: "space-between" }}>
           <View>
-            <Text style={{ color: "#4D4D4D", fontSize: 16, fontWeight: "700" }}>Feijão - 2 KG</Text>
-            <Text style={{ fontSize: 12, color: "#00000080", fontWeight: "400" }}>Mineirinho agricultor</Text>
+            <Text
+              style={{ color: "#4D4D4D", fontSize: 16, fontWeight: "700" }}
+            >{`${item.name} - ${item.kgPortion} KG`}</Text>
+            <Text style={{ fontSize: 12, color: "#00000080", fontWeight: "400" }}>{farmer}</Text>
           </View>
 
-          <Text style={{ color: "#00A861", fontWeight: "700", fontSize: 16 }}>R$ 15,99</Text>
+          <Text style={{ color: "#00A861", fontWeight: "700", fontSize: 16 }}>
+            {`R$ ${item.value.toFixed(2).toString().replace(".", ",")}`}
+          </Text>
         </View>
       </View>
 
       <View style={{ flexDirection: "column-reverse", marginLeft: "auto" }}>
         <TouchableOpacity
+          onPress={() => {
+            addCart({ ...item, nickname: farmer, quantity: 1 });
+          }}
           activeOpacity={0.75}
           style={{
             height: 32,
@@ -130,42 +176,46 @@ const ItemCard: React.FC = () => {
   );
 };
 
-const CarouselItem: React.FC<{ index: number }> = ({ index }) => {
+const CarouselItem: React.FC<{ item: Farmer; onClickFarmer(id: Farmer["_id"]): Promise<void> }> = ({
+  item,
+  onClickFarmer,
+}) => {
   return (
-    <View
-      key={index}
-      style={{
-        width: 180,
-        height: 124,
-        backgroundColor: "#ffffff",
-        borderRadius: 8,
-        borderColor: "#00000033",
-        borderWidth: 1,
-      }}
-    >
-      <ImageBackground
-        source={require("../../../assets/mineirinhos_farm.png")}
-        resizeMode={"cover"}
-        imageStyle={{
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8,
-        }}
+    <TouchableWithoutFeedback onPress={() => onClickFarmer(item._id)}>
+      <View
         style={{
-          height: 80,
-          width: "100%",
-          justifyContent: "center",
-          alignItems: "center",
+          width: 180,
+          height: 124,
+          backgroundColor: "#ffffff",
+          borderRadius: 8,
+          borderColor: "#00000033",
+          borderWidth: 1,
         }}
       >
-        <Image
-          style={{ borderRadius: 36, height: 72, width: 72, backgroundColor: "#CACACA" }}
-          source={require("../../../assets/avatar.png")}
+        <ImageBackground
+          source={require("../../../assets/mineirinhos_farm.png")}
           resizeMode={"cover"}
-        />
-      </ImageBackground>
-      <View style={{ height: 44, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ fontSize: 12, fontWeight: "700" }}>Mineirinho agricultor</Text>
+          imageStyle={{
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
+          }}
+          style={{
+            height: 80,
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            style={{ borderRadius: 36, height: 72, width: 72, backgroundColor: "#CACACA" }}
+            source={require("../../../assets/avatar.png")}
+            resizeMode={"cover"}
+          />
+        </ImageBackground>
+        <View style={{ height: 44, justifyContent: "center", alignItems: "center" }}>
+          <Text style={{ fontSize: 12, fontWeight: "700" }}>{item.nickname}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
